@@ -25,13 +25,32 @@ const pool = mysql.createPool({
     connectionLimit : 10,
     host: 'localhost',
     user: 'root',
-    password: ' ',
+    password: '4lizzy@School',
     database: 'smarthr'
 })
 
+
+
 app.post('/fontend', async(req, res) => {
-  let {newEntry , newMail, newRole, newStack ,newComp, p2p } = req.body
-  console.log(newEntry)
+
+  pool.getConnection((err, connection)=>{
+    if(err) throw err
+    console.log(`connected as id ${connection.threadId}`)
+
+    const params = req.body
+
+    connection.query('INSERT INTO staff SET ?', params , (err, rows)=>{
+       connection.release()
+
+       if(!err){
+         res.send(`The record ${req.name} has been added`)
+       }else{
+         console.log(err)
+       }
+    })
+})
+
+
 })
 
 
