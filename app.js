@@ -7,7 +7,10 @@ const fs = require('fs')
 const fsPromises = require('fs').promises;
 const PORT  = process.env.PORT || 5000
 const connectDB = require('./config/dbConn')
+const cors = require('cors')
 
+
+app.use(cors({origin: true, credentials: true}));
 
 const mysql = require('mysql')
 const bodyparser = require('body-parser')
@@ -25,6 +28,13 @@ const pool = mysql.createPool({
     password: ' ',
     database: 'smarthr'
 })
+
+app.post('/fontend', async(req, res) => {
+  let {newEntry , newMail, newRole, newStack ,newComp, p2p } = req.body
+  console.log(newEntry)
+})
+
+
 
 //get all
 app.get('/tstaff', (req, res)=>{
@@ -136,9 +146,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/staff', require('./routes/api/staff_route'))
 app.use('/register', require('./routes/api/regsiter'))
 
-app.get('/f', (req, res)=>{
-  res.send('dfdf')
-})
 
 mongoose.connection.once('open', ()=>{
   console.log('Connected to Mongo');
