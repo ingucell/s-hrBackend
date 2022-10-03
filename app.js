@@ -25,7 +25,7 @@ const pool = mysql.createPool({
     connectionLimit : 10,
     host: 'localhost',
     user: 'root',
-    password: '4lizzy@School',
+    password: '',
     database: 'smarthr'
 })
 
@@ -49,8 +49,24 @@ app.post('/fontend', async(req, res) => {
        }
     })
 })
+})
 
+app.get('/avlist', cors() ,async(req, res)=>{
+  pool.getConnection((err, connection)=>{
+    if(err) throw err
+    console.log(`connected as id ${connection.threadId}`)
 
+    //queries
+    connection.query('SELECT * from staff', (err, rows)=>{
+       connection.release()
+
+       if(!err){
+         res.send(rows)
+       }else{
+         console.log(err)
+       }
+    })
+})
 })
 
 
