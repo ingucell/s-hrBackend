@@ -8,7 +8,13 @@ const fsPromises = require('fs').promises;
 const PORT  = process.env.PORT || 5000
 const connectDB = require('./config/dbConn')
 const cors = require('cors')
+const logger = require('./logger/prodLogger')
 
+
+
+logger.info('text info');
+logger.warn('text warn');
+logger.error('text error')
 
 app.use(cors({origin: true, credentials: true}));
 
@@ -25,12 +31,12 @@ const pool = mysql.createPool({
     connectionLimit : 10,
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: '4lizzy@School',
     database: 'smarthr'
 })
 
 
-
+//create people
 app.post('/fontend', async(req, res) => {
 
   pool.getConnection((err, connection)=>{
@@ -51,6 +57,9 @@ app.post('/fontend', async(req, res) => {
 })
 })
 
+
+//available people
+
 app.get('/avlist', cors() ,async(req, res)=>{
   pool.getConnection((err, connection)=>{
     if(err) throw err
@@ -67,6 +76,29 @@ app.get('/avlist', cors() ,async(req, res)=>{
        }
     })
 })
+})
+
+
+//specific people 
+app.post('/pick', (req, res)=>{
+  pool.getConnection((err, connection)=>{
+       if(err) throw err
+       console.log(`connected as id ${connection.threadId}`)
+
+
+       const params = req.body
+       console.log(req.body)
+       //queries
+       connection.query('SELECT * from staff WHERE id = ?', params, (err, rows)=>{
+          connection.release()
+
+          if(!err){
+            res.send(rows)
+          }else{
+            console.log(err)
+          }
+       })
+  })
 })
 
 
