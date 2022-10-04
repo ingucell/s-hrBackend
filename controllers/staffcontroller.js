@@ -1,39 +1,47 @@
 const staff = require('../model/staff')
 
-
+//get all staff
 const getAllStaff = (req, res) =>{
-    res.json(staff.name);
-}
+        pool.getConnection((err, connection)=>{
+          if(err) throw err
+          console.log(`connected as id ${connection.threadId}`)
+      
+          //queries
+          connection.query('SELECT * from staff', (err, rows)=>{
+             connection.release()
+      
+             if(!err){
+               res.send(rows)
+             }else{
+               console.log(err)
+             }
+          })
+      })
+      }
 
+
+
+//create new staff
 const createNewStaff = async (req, res) =>{
-     const { name, mail, role, stack , projectsCompleted, reportingDays, p2p} = req.body
 
-    if(!name || !mail) return res.status(400).json({'message' : 'name required'});
+        pool.getConnection((err, connection)=>{
+          if(err) throw err
+          console.log(`connected as id ${connection.threadId}`)
+      
+          const params = req.body
+      
+          connection.query('INSERT INTO staff SET ?', params , (err, rows)=>{
+             connection.release()
+      
+             if(!err){
+               res.send(`The record ${req.name} has been added`)
+             }else{
+               console.log(err)
+             }
+          })
+      })
+      }
 
-    ///dup
-    const duplicate = await staff.findOne ({name: name}).exec();
-    if(duplicate) return res.sendStatus(409);
-    try{
-        //create and store new user
-            const result = await staff.create({
-                "name" : name , 
-                "mail" : mail,
-                "role" : role,
-                "stack" : stack, 
-                "projectsCompleted" : projectsCompleted,
-                "reportingDays" : reportingDays,
-                "p2p" : p2p
-            });
-
-            console.log(result)
-
-            res.status(201).json({'success':`New User ${result.name} created`}) } 
-            catch (err) {
-                res.status(500).json({'message' : err.message})
-            }
-     //res.send(`The Contact ${newStaff.name} has been created`)
-     res.status(201).json(staff)
-}
 
 
  

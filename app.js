@@ -8,7 +8,15 @@ const fsPromises = require('fs').promises;
 const PORT  = process.env.PORT || 5000
 const connectDB = require('./config/dbConn')
 const cors = require('cors')
-const logger = require('./logger/prodLogger')
+const logger = require('./logger/logger')
+
+
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', "POST", "PUT", "DELETE"]
+}))
+
 
 
 
@@ -16,10 +24,11 @@ logger.info('text info');
 logger.warn('text warn');
 logger.error('text error')
 
-app.use(cors({origin: true, credentials: true}));
+
 
 const mysql = require('mysql')
-const bodyparser = require('body-parser')
+const bodyparser = require('body-parser');
+const { application } = require('express');
 
 app.use(bodyparser.urlencoded({extended: false}))
 app.use(bodyparser.json())
@@ -31,7 +40,7 @@ const pool = mysql.createPool({
     connectionLimit : 10,
     host: 'localhost',
     user: 'root',
-    password: '4lizzy@School',
+    password: '',
     database: 'smarthr'
 })
 
@@ -60,7 +69,7 @@ app.post('/fontend', async(req, res) => {
 
 //available people
 
-app.get('/avlist', cors() ,async(req, res)=>{
+app.get('/avlist', async(req, res)=>{
   pool.getConnection((err, connection)=>{
     if(err) throw err
     console.log(`connected as id ${connection.threadId}`)
@@ -78,28 +87,61 @@ app.get('/avlist', cors() ,async(req, res)=>{
 })
 })
 
-
-//specific people 
-app.post('/pick', (req, res)=>{
+//id by mail
+app.post('/ov', async (req, res)=>{
   pool.getConnection((err, connection)=>{
        if(err) throw err
-       console.log(`connected as id ${connection.threadId}`)
-
-
-       const params = req.body
-       console.log(req.body)
-       //queries
-       connection.query('SELECT * from staff WHERE id = ?', params, (err, rows)=>{
-          connection.release()
-
+       //console.log(`connected as id ${connection.threadId}`)
+       const {mail} = req.body
+       const email = req.body.mail;
+       
+        console.log(email,"testing")
+      connection.query('SELECT * from `staff` WHERE staff.mail = ?', mail ,  (err, rows)=>{
+       connection.release()
           if(!err){
-            res.send(rows)
+
+            console.log(rows, "Response from backend")
+
+            res.status(200).json({status:1, data:rows, statusCode:200});
+
+        //  res.send(rows)
+          //  res.send(rows.name)
+           //  res.send(rows)
+           // res.send(rows)
+          //res.status(200).json({status:1, data:mail, statusCode:200})
+          // res.status(200).json({status:1, data:mail, statusCode:200});
           }else{
-            console.log(err)
+            return res.end({status:0, message:"exception occured", statusCode:400});
           }
        })
-  })
+  }) 
 })
+
+//get values by given id
+// app.get('/ov', async(req, res)=>{
+//   pool.getConnection((err, connection)=>{
+//     if(err) throw err
+//     console.log(`connected as id ${connection.threadId}`)
+
+//     const {mail} = req.body
+//     console.log(req.body)
+    
+//     const params = JSON.stringify(req.body)
+//     console.log(params)
+//     const string_form = (JSON.parse(params))
+//     const ultra_string = string_form.mail
+//   //  console.log(ultra_string)
+//     connection.query('SELECT * from `staff` WHERE staff.mail = ?' , 'params' ,(err, rows)=>{
+//        connection.release()
+
+//        if(!err){
+//         res.send(rows);
+//        }else{
+//          return res.end({status:0, message:"exception occured", statusCode:400});
+//        }
+//     })
+// })
+// })
 
 
 
@@ -211,7 +253,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/staff', require('./routes/api/staff_route'))
-app.use('/register', require('./routes/api/regsiter'))
+
 
 
 mongoose.connection.once('open', ()=>{

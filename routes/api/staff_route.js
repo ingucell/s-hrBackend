@@ -4,7 +4,7 @@ const getstaff = require('../../controllers/staffcontroller')
 
 
 
-router.route('/')
+router.route('/staff')
     .get(getstaff.getAllStaff)
     .post(getstaff.createNewStaff)
 
