@@ -53,6 +53,7 @@ app.post('/fontend', async(req, res) => {
     console.log(`connected as id ${connection.threadId}`)
 
     const params = req.body
+    console.log(req.body)
 
     connection.query('INSERT INTO staff SET ?', params , (err, rows)=>{
        connection.release()
