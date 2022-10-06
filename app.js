@@ -40,7 +40,7 @@ const pool = mysql.createPool({
     connectionLimit : 10,
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: '4lizzy@School',
     database: 'smarthr'
 })
 
@@ -94,14 +94,14 @@ app.post('/ov', async (req, res)=>{
        if(err) throw err
        //console.log(`connected as id ${connection.threadId}`)
        const {mail} = req.body
-       const email = req.body.mail;
+      
        
-        console.log(email,"testing")
+         console.log(req.body)
       connection.query('SELECT * from `staff` WHERE staff.mail = ?', mail ,  (err, rows)=>{
        connection.release()
           if(!err){
 
-            console.log(rows, "Response from backend")
+         //   console.log(rows, "Response from backend")
 
             res.status(200).json({status:1, data:rows, statusCode:200});
 
@@ -118,92 +118,32 @@ app.post('/ov', async (req, res)=>{
   }) 
 })
 
-//get values by given id
-// app.get('/ov', async(req, res)=>{
-//   pool.getConnection((err, connection)=>{
-//     if(err) throw err
-//     console.log(`connected as id ${connection.threadId}`)
-
-//     const {mail} = req.body
-//     console.log(req.body)
-    
-//     const params = JSON.stringify(req.body)
-//     console.log(params)
-//     const string_form = (JSON.parse(params))
-//     const ultra_string = string_form.mail
-//   //  console.log(ultra_string)
-//     connection.query('SELECT * from `staff` WHERE staff.mail = ?' , 'params' ,(err, rows)=>{
-//        connection.release()
-
-//        if(!err){
-//         res.send(rows);
-//        }else{
-//          return res.end({status:0, message:"exception occured", statusCode:400});
-//        }
-//     })
-// })
-// })
-
-
-
-//get all
-app.get('/tstaff', (req, res)=>{
-  pool.getConnection((err, connection)=>{
-       if(err) throw err
-       console.log(`connected as id ${connection.threadId}`)
-
-       //queries
-       connection.query('SELECT * from staff', (err, rows)=>{
-          connection.release()
-
-          if(!err){
-            res.send(rows)
-          }else{
-            console.log(err)
-          }
-       })
-  })
-})
- 
-
-//specific
-app.get('/tstaff/:id', (req, res)=>{
-  pool.getConnection((err, connection)=>{
-       if(err) throw err
-       console.log(`connected as id ${connection.threadId}`)
-
-       //queries
-       connection.query('SELECT * from staff WHERE id = ?', [req.params.id], (err, rows)=>{
-          connection.release()
-
-          if(!err){
-            res.send(rows)
-          }else{
-            console.log(err)
-          }
-       })
-  })
-})
-
 
 //delte 
-app.delete('/tstaff/:id', (req, res)=>{
+app.post('/del', (req, res)=>{
   pool.getConnection((err, connection)=>{
        if(err) throw err
        console.log(`connected as id ${connection.threadId}`)
 
+      const { mail } = req.body;
+
+      console.log(typeof mail)
+
        //queries
-       connection.query('DELETE from staff WHERE id = ?', [req.params.id], (err, rows)=>{
+       connection.query('DELETE from `staff` WHERE staff.mail = ?', mail , (err, rows)=>{
           connection.release()
 
           if(!err){
-            res.send(`The record ${req.params.id} removed`)
+            res.send(`The record ${mail} removed`)
           }else{
             console.log(err)
           }
        })
   })
 })
+
+
+
 
 //add
 app.post('/tstaff', (req, res)=>{
